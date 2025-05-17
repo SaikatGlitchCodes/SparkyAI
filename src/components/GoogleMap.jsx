@@ -28,7 +28,7 @@ export default function GoogleMapCustom() {
     return (
         <Box
             ref={mapContainerRef}
-            height="400px"
+            height="350px"
             width="100%"
             borderRadius="xl"
             overflow="hidden"
