@@ -1,0 +1,88 @@
+import React, { useState } from 'react';
+import { Box } from "@chakra-ui/react";
+import '../App.css';
+
+import Header from '../components/Header';
+import SummarySection from '../components/SummarySection';
+import FarmManagement from '../components/FarmManagement';
+import PredictiveAnalysis from '../components/PredictiveAnalysis';
+import Sidebar from '../components/Sidebar';
+import ActionBarComponent from '../components/ActionBarComponent';
+
+function Home() {
+  const [addNewCrop, setAddNewCrop] = useState(false);
+  const [cards, setCards] = useState([
+    {
+      id: 1,
+      title: "Wheat",
+      subtitle: "Total Production",
+      value: "125",
+      unit: "Tons",
+      progress: 5,
+      colorScheme: "green"
+    }
+  ]);
+  const [selectedCrop, setSelectedCrop] = useState(cards[0]);
+
+  const addCard = () => {
+    const colorSchemes = ["red", "orange", "yellow", "green", "teal", "blue", "cyan", "purple", "pink"];
+    const randomColor = colorSchemes[Math.floor(Math.random() * colorSchemes.length)];
+
+    const newCard = {
+      id: Date.now(),
+      title: "New Item",
+      subtitle: "Add description",
+      value: "0",
+      unit: "Units",
+      progress: 0,
+      colorScheme: randomColor
+    };
+    setCards([...cards, newCard]);
+  };
+
+  return (
+    <Box padding={{md:"40px", base:"15px"}} className="container">
+      <Header />
+      
+      <Box 
+        display="flex" 
+        flexDirection={{ base: "column", md: "row" }}
+        gap="5"
+        flexWrap="wrap"
+      >
+        <Box 
+          width={{ base: "100%", md: "60%" }} 
+          pr={{ base: "0" }}
+          mb={{ base: "6", md: "0" }}
+        >
+          <SummarySection 
+            cards={cards}
+            selectedCrop={selectedCrop}
+            setSelectedCrop={setSelectedCrop}
+            setAddNewCrop={setAddNewCrop}
+            addNewCrop={addNewCrop}
+          />
+          
+          <FarmManagement />
+          
+          <PredictiveAnalysis />
+        </Box>
+        
+        <Box 
+          width={{ base: "100%", md: "35%" }} 
+          pl={{ base: "0", md: "4" }}
+        >
+          <Sidebar />
+        </Box>
+      </Box>
+      
+      <ActionBarComponent 
+        isOpen={addNewCrop}
+        onClose={() => setAddNewCrop(false)}
+        onAddCard={addCard}
+      />
+    </Box>
+  );
+}
+
+export default Home;

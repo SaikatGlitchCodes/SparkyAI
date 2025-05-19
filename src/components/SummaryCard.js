@@ -7,7 +7,7 @@ const SummaryCard = ({ title, subtitle, value, unit, progress, colorScheme }) =>
 
   return (
     <Box
-      width="96"
+      width={{ base: "100%", md: "96" }}
       padding="12px"
       rounded="md"
       display="flex"

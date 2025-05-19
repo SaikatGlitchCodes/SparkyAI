@@ -1,39 +1,30 @@
-import React, { useRef } from "react";
-import { APIProvider, Map } from '@vis.gl/react-google-maps';
-import { Box } from "@chakra-ui/react";
-
-const AnyReactComponent = ({ text }) => (
-    <Box
-        bg="red.500"
-        color="white"
-        p={2}
-        borderRadius="md"
-        boxShadow="md"
-    >
-        {text}
-    </Box>
-);
-
-export default function GoogleMapCustom() {
-    const defaultProps = {
-        center: {
-            lat: 10.99835602,
-            lng: 77.01502627
-        },
-        zoom: 11
+    import React from 'react';
+    import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import { googleMapApiKey } from '../utils/supabase';
+    
+    const MapComponent = () => {
+      const mapStyles = {
+        height: '400px',
+        width: '100%',
+        borderRadius: '8px',
+      };
+    
+      const defaultCenter = {
+        lat: 40.7128,
+        lng: -74.0060
+      };
+    
+      return (
+        <LoadScript googleMapsApiKey={googleMapApiKey}>
+          <GoogleMap
+            mapContainerStyle={mapStyles}
+            zoom={18}
+            center={defaultCenter}
+          >
+            <Marker position={defaultCenter} />
+          </GoogleMap>
+        </LoadScript>
+      );
     };
-
-    const mapContainerRef = useRef(null);
-    console.log(process.env.GOOGLE_MAPS_API_KEY)
-    return (
-        <Box
-            ref={mapContainerRef}
-            height="350px"
-            width="100%"
-            borderRadius="xl"
-            overflow="hidden"
-            bg="gray.100"
-        >
-        </Box>
-    );
-}
+    
+    export default MapComponent;
