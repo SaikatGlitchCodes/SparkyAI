@@ -2,6 +2,7 @@ import React from 'react';
 import { Avatar, Box, Flex } from "@chakra-ui/react";
 import { GrStepsOption } from "react-icons/gr";
 import { useAuth } from '../context/AuthContext';
+import { ColorModeButton } from './ui/color-mode';
 
 const AvatarProfile = () => (
   <Flex justify="flex-end" align="center">
@@ -14,15 +15,16 @@ const AvatarProfile = () => (
 
 const Header = () => {
   const {user} = useAuth();
-  console.log('User: ',user);
+  console.log('USer:',user);
   return (
     <Flex justify="space-between" align="center" mb="3" gapX="9">
       <GrStepsOption />
       <Box display="flex" gapX="9">
+        <ColorModeButton/>
         <AvatarProfile />
       </Box>
     </Flex>
   );
-};
+  };
 
 export default Header;
