@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Box } from "@chakra-ui/react";
+import { Box, Text, CloseButton } from "@chakra-ui/react";
+import { motion } from 'framer-motion';
 import '../App.css';
 
 import Header from '../components/Header';
@@ -8,9 +9,13 @@ import FarmManagement from '../components/FarmManagement';
 import PredictiveAnalysis from '../components/PredictiveAnalysis';
 import Sidebar from '../components/Sidebar';
 import ActionBarComponent from '../components/ActionBarComponent';
+import { GiFirePunch } from "react-icons/gi";
+
+const MotionBox = motion(Box);
 
 function Home() {
   const [addNewCrop, setAddNewCrop] = useState(false);
+  const [showTip, setShowTip] = useState(true);
   const [cards, setCards] = useState([
     {
       id: 1,
@@ -62,6 +67,35 @@ function Home() {
             setAddNewCrop={setAddNewCrop}
             addNewCrop={addNewCrop}
           />
+          
+          {showTip && (
+            <MotionBox 
+              mt="6" 
+              position="relative" 
+              display="flex" 
+              alignItems="center" 
+              gap="4" 
+              borderRadius="lg" 
+              bg="cyan.100" 
+              p="4" 
+              width={{ base: "100%", md: "80%" }}
+              initial={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <GiFirePunch size="3em"/>
+              <Text fontWeight="medium" fontSize={{ base: "md", md: "xl" }}>
+                You can increase profits by rotating crops, land looks good for it.
+              </Text>
+              <CloseButton 
+                position="absolute" 
+                right="2" 
+                top="2"
+                size="sm"
+                onClick={() => setShowTip(false)}
+              />
+            </MotionBox>
+          )}
           
           <FarmManagement />
           

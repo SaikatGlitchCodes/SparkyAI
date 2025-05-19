@@ -24,7 +24,7 @@ const WeatherCard = ({
   temperature = "25", 
   condition = "Sunny", 
   iconType = "sunny",
-  bgColor = "cyan.100",
+  bgColor = "green.100",
   forecast = defaultForecast
 }) => {
   // Select weather icon based on condition
