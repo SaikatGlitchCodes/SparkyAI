@@ -11,6 +11,7 @@ import { useDashboard } from "../context/DashBoardContext"
 
 const ChartGraph = () => {
   const {chartData} = useDashboard();
+
   const chart = useChart({
     data: chartData,
     series: [
@@ -19,7 +20,7 @@ const ChartGraph = () => {
       { name: "linux", color: "blue.solid" },
     ],
   })
-
+  if(chartData.length === 0) return null;
   return (
     <Chart.Root maxH="sm" chart={chart} rounded="lg">
       <AreaChart data={chart.data}>

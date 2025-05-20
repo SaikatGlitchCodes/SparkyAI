@@ -15,7 +15,9 @@ const MotionDivider = motion(Separator);
 const WeatherCard = () => {
   // Get weather data from context
   const { weatherData } = useDashboard();
-  
+  if(Object.keys(weatherData).length === 0){
+    return <Text>Not Present</Text>;
+  }
   const { 
     temperature, 
     condition, 
@@ -26,7 +28,7 @@ const WeatherCard = () => {
 
   // Select weather icon based on condition
   const getWeatherIcon = (type = iconType) => {
-    switch(type.toLowerCase()) {
+    switch(type?.toLowerCase()) {
       case 'cloudy':
         return <WiCloudy size="6em" />;
       case 'rainy':
@@ -43,7 +45,7 @@ const WeatherCard = () => {
 
   // Get small weather icon
   const getSmallWeatherIcon = (type) => {
-    switch(type.toLowerCase()) {
+    switch(type?.toLowerCase()) {
       case 'cloudy':
         return <WiCloudy size="1.5em" />;
       case 'rainy':
@@ -60,7 +62,7 @@ const WeatherCard = () => {
 
   // Get image URL based on weather condition
   const getWeatherImage = () => {
-    switch(iconType.toLowerCase()) {
+    switch(iconType?.toLowerCase()) {
       case 'cloudy':
         return "https://cdn-icons-png.flaticon.com/512/1146/1146869.png";
       case 'rainy':

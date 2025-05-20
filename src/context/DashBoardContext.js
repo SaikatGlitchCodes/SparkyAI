@@ -1,10 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toaster } from '../components/ui/toaster';
 
-// Create the context
 const DashboardContext = createContext();
 
-// Sample default data (fallback data when loading)
 const defaultCropData = [
   {
     id: 1,
@@ -48,7 +46,7 @@ const defaultNutrientData = [
   },
   {
     id: 3,
-    icon: "/assets/nitrogen.png",
+    icon: "../assets/nitrogen.png",
     alt: "Nitrogen Levels",
     bgColor: "purple.100",
     value: 40
@@ -79,49 +77,25 @@ const defaultMapCenter = {
 };
 
 export function DashboardProvider({ children }) {
-  // State for different data categories
-  const [cropData, setCropData] = useState(defaultCropData);
-  const [weatherData, setWeatherData] = useState(defaultWeatherData);
-  const [nutrientData, setNutrientData] = useState(defaultNutrientData);
-  const [harvestCostData, setHarvestCostData] = useState(defaultHarvestCostData);
-  const [chartData, setChartData] = useState(defaultChartData);
+
+  const [cropData, setCropData] = useState([]);
+  const [weatherData, setWeatherData] = useState({});
+  const [nutrientData, setNutrientData] = useState([]);
+  const [harvestCostData, setHarvestCostData] = useState([]);
+  const [chartData, setChartData] = useState([]);
   const [mapCenter, setMapCenter] = useState(defaultMapCenter);
-  const [selectedCrop, setSelectedCrop] = useState(defaultCropData[0]);
+  const [selectedCrop, setSelectedCrop] = useState({});
+  const [suggestions, setSuggestions] = useState("");
   
-  // UI state
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Load all dashboard data on component mount
   useEffect(() => {
     async function loadDashboardData() {
       setLoading(true);
       setError(null);
 
       try {
-        // In a real app, you would fetch data from Supabase here
-        // For example:
-        // const { data: cropsData, error: cropsError } = await supabase
-        //   .from('crops')
-        //   .select('*');
-        
-        // if (cropsError) throw cropsError;
-        // setCropData(cropsData);
-        
-        // For demonstration, we'll simulate loading with a timeout
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Set with real data from your API calls
-        // For now we'll just use the defaults
-        setCropData(defaultCropData);
-        setWeatherData(defaultWeatherData);
-        setNutrientData(defaultNutrientData);
-        setHarvestCostData(defaultHarvestCostData);
-        setChartData(defaultChartData);
-        setMapCenter(defaultMapCenter);
-        setSelectedCrop(defaultCropData[0]);
-
-        // Show success message
         toaster.create({
           title: "Dashboard loaded",
           description: "All data has been successfully retrieved",
@@ -132,7 +106,6 @@ export function DashboardProvider({ children }) {
         console.error("Error loading dashboard data:", err);
         setError(err.message || "Failed to load dashboard data");
         
-        // Show error message
         toaster.create({
           title: "Error loading dashboard",
           description: err.message || "Failed to load dashboard data",
@@ -147,21 +120,18 @@ export function DashboardProvider({ children }) {
     loadDashboardData();
   }, []);
 
-  // Function to add a new crop
   const addCrop = (newCrop) => {
     const updatedCrops = [...cropData, newCrop];
     setCropData(updatedCrops);
     return updatedCrops;
   };
 
-  // Function to update an existing crop
   const updateCrop = (id, updatedCrop) => {
     const updatedCrops = cropData.map(crop => 
       crop.id === id ? { ...crop, ...updatedCrop } : crop
     );
     setCropData(updatedCrops);
     
-    // If the selected crop was updated, update it too
     if (selectedCrop.id === id) {
       setSelectedCrop({ ...selectedCrop, ...updatedCrop });
     }
@@ -169,14 +139,11 @@ export function DashboardProvider({ children }) {
     return updatedCrops;
   };
 
-  // Function to refresh all dashboard data
   const refreshDashboard = async () => {
     setLoading(true);
     try {
-      // In a real app, you would fetch fresh data here
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Show success message
       toaster.create({
         title: "Dashboard refreshed",
         description: "All data has been updated",
@@ -186,7 +153,6 @@ export function DashboardProvider({ children }) {
     } catch (err) {
       setError(err.message || "Failed to refresh dashboard data");
       
-      // Show error message
       toaster.create({
         title: "Error refreshing dashboard",
         description: err.message || "Failed to refresh dashboard data",
@@ -198,7 +164,6 @@ export function DashboardProvider({ children }) {
     }
   };
 
-  // Value to be provided by the context
   const value = {
     // Data
     cropData,
@@ -208,6 +173,7 @@ export function DashboardProvider({ children }) {
     chartData,
     mapCenter,
     selectedCrop,
+    suggestions,
     
     // State
     loading,
@@ -218,7 +184,8 @@ export function DashboardProvider({ children }) {
     addCrop,
     updateCrop,
     refreshDashboard,
-    setMapCenter
+    setMapCenter,
+    setSuggestions,
   };
 
   return (

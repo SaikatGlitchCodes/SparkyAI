@@ -75,7 +75,7 @@ export default function SignIn() {
         transition={{ duration: 0.5 }}
       >
         <Box textAlign="center">
-          <Heading size="lg" mb={6}>
+          <Heading size="lg" mb={6} color="black">
             {isSignUp ? 'Create Your Account' : 'Sign in to Farm Analytics'} 
           </Heading>
         </Box>
@@ -96,6 +96,7 @@ export default function SignIn() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 bg="white"
+                color="black"
               />
             </Field.Root>
             
@@ -106,6 +107,7 @@ export default function SignIn() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 bg="white"
+                color="black"
               />
             </Field.Root>
             
@@ -122,7 +124,7 @@ export default function SignIn() {
         </form>
         
         <Box mt={6} textAlign="center">
-          <Text>
+          <Text color="black">
             {isSignUp 
               ? 'Already have an account?' 
               : "Don't have an account?"}{' '}

@@ -22,7 +22,8 @@ function Home() {
     selectedCrop, 
     setSelectedCrop, 
     loading, 
-    addCrop 
+    addCrop,
+    suggestions,
   } = useDashboard();
   
   if (loading) {
@@ -67,7 +68,7 @@ function Home() {
             addNewCrop={addNewCrop}
           />
           
-          {showTip && (
+          {showTip && suggestions.length > 0 && (
             <MotionBox 
               mt="6" 
               position="relative" 
@@ -83,8 +84,8 @@ function Home() {
               transition={{ duration: 0.3 }}
             >
               <GiFirePunch size="3em"/>
-              <Text fontWeight="medium" fontSize={{ base: "md", md: "xl" }}>
-                You can increase profits by rotating crops, land looks good for it.
+               <Text fontWeight="medium" fontSize={{ base: "md", md: "xl" }}>
+                {suggestions}
               </Text>
               <CloseButton 
                 position="absolute" 
