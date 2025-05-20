@@ -4,13 +4,13 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Home from './pages/Home';
 import SignIn from './pages/SignIn';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { DashboardProvider } from './context/DashBoardContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function AppRoutes() {
   const { user, loading } = useAuth();
   
   if (loading) {
-    // You could add a loading spinner here
     return <div>Loading...</div>;
   }
   
@@ -20,7 +20,9 @@ function AppRoutes() {
         path="/" 
         element={
           <ProtectedRoute>
-            <Home />
+            <DashboardProvider>
+              <Home />
+            </DashboardProvider>
           </ProtectedRoute>
         } 
       />

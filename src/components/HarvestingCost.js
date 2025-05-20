@@ -1,21 +1,14 @@
 import React, { useState } from 'react';
-import { Box, Text, Image, Flex } from "@chakra-ui/react";
+import { Box, Text, Flex } from "@chakra-ui/react";
 import { motion, AnimatePresence } from 'framer-motion';
 import { LiaRupeeSignSolid } from "react-icons/lia";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import { useDashboard } from '../context/DashBoardContext';
 
 // Create motion components
 const MotionBox = motion(Box);
 const MotionText = motion(Text);
 const MotionFlex = motion(Flex);
-
-// Default cost items if none provided
-const defaultCostItems = [
-  { id: 1, category: "Irrigation", amount: 4500, color: "#2B6CB0" }, // blue.700
-  { id: 2, category: "Fertilizers", amount: 3500, color: "#2F855A" }, // green.700 
-  { id: 3, category: "Labor", amount: 5500, color: "#C05621" }, // orange.700
-  { id: 4, category: "Equipment", amount: 2800, color: "#6B46C1" }, // purple.700
-];
 
 // Custom Tooltip component for the pie chart
 const CustomTooltip = ({ active, payload }) => {
@@ -40,12 +33,15 @@ const CustomTooltip = ({ active, payload }) => {
   return null;
 };
 
-const HarvestingCost = ({ costItems = defaultCostItems, bgColor = "green.100" }) => {
+const HarvestingCost = () => {
+  // Get data from context instead of props
+  const { harvestCostData } = useDashboard();
+  
   // Calculate total cost
-  const totalCost = costItems.reduce((sum, item) => sum + item.amount, 0);
+  const totalCost = harvestCostData.reduce((sum, item) => sum + item.amount, 0);
   
   // Format data for the pie chart
-  const pieData = costItems.map(item => ({
+  const pieData = harvestCostData.map(item => ({
     name: item.category,
     value: item.amount,
     color: item.color
@@ -68,7 +64,7 @@ const HarvestingCost = ({ costItems = defaultCostItems, bgColor = "green.100" })
       position="relative" 
       rounded="lg" 
       width="full" 
-      bg={bgColor}  
+      bg="green.100"  
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -185,7 +181,7 @@ const HarvestingCost = ({ costItems = defaultCostItems, bgColor = "green.100" })
             transition={{ delay: 1.1, duration: 0.4 }}
           >
             <AnimatePresence>
-              {costItems.map((item, index) => (
+              {harvestCostData.map((item, index) => (
                 <MotionFlex
                   key={item.id}
                   align="center"
