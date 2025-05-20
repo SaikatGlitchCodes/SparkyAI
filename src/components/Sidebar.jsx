@@ -5,8 +5,10 @@ import { LiaRupeeSignSolid } from "react-icons/lia";
 import WeatherCard from './WeatherCard';
 import SoilNutrients from './SoilNutrients';
 import HarvestingCost from './HarvestingCost';
+import { useDashboard } from '../context/DashBoardContext';
 
 const Sidebar = () => {
+  const {harvestCostData} = useDashboard();
   return (
     <Box width="100%">
       <Text fontSize="lg" display="flex" gapX="3">
@@ -20,11 +22,7 @@ const Sidebar = () => {
         Harvesting Cost <LiaRupeeSignSolid size="1.5em" />
       </Text>
       <HarvestingCost 
-        costItems={[
-          { id: 1, category: "Irrigation", amount: 4500 },
-          { id: 2, category: "Fertilizers", amount: 3500 },
-          { id: 3, category: "Labor", amount: 5500 },
-        ]}
+        costItems={harvestCostData}
         bgColor="white"
       />
     </Box>

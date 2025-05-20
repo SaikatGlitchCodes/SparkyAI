@@ -15,7 +15,7 @@ const AvatarProfile = () => (
 
 const Header = () => {
   const {user} = useAuth();
-  console.log('USer:',user);
+  console.log('User:',user);
   return (
     <Flex justify="space-between" align="center" mb="3" gapX="9">
       <GrStepsOption />

@@ -10,30 +10,30 @@ import PredictiveAnalysis from '../components/PredictiveAnalysis';
 import Sidebar from '../components/Sidebar';
 import ActionBarComponent from '../components/ActionBarComponent';
 import { GiFirePunch } from "react-icons/gi";
+import { useDashboard } from '../context/DashBoardContext';
 
 const MotionBox = motion(Box);
 
 function Home() {
   const [addNewCrop, setAddNewCrop] = useState(false);
   const [showTip, setShowTip] = useState(true);
-  const [cards, setCards] = useState([
-    {
-      id: 1,
-      title: "Wheat",
-      subtitle: "Total Production",
-      value: "125",
-      unit: "Tons",
-      progress: 5,
-      colorScheme: "green"
-    }
-  ]);
-  const [selectedCrop, setSelectedCrop] = useState(cards[0]);
+  const { 
+    cropData, 
+    selectedCrop, 
+    setSelectedCrop, 
+    loading, 
+    addCrop 
+  } = useDashboard();
+  
+  if (loading) {
+    return <div>Loading dashboard data...</div>;
+  }
 
   const addCard = () => {
     const colorSchemes = ["red", "orange", "yellow", "green", "teal", "blue", "cyan", "purple", "pink"];
     const randomColor = colorSchemes[Math.floor(Math.random() * colorSchemes.length)];
 
-    const newCard = {
+    addCrop({
       id: Date.now(),
       title: "New Item",
       subtitle: "Add description",
@@ -41,8 +41,7 @@ function Home() {
       unit: "Units",
       progress: 0,
       colorScheme: randomColor
-    };
-    setCards([...cards, newCard]);
+    });
   };
 
   return (
@@ -61,7 +60,7 @@ function Home() {
           mb={{ base: "6", md: "0" }}
         >
           <SummarySection 
-            cards={cards}
+            cards={cropData}
             selectedCrop={selectedCrop}
             setSelectedCrop={setSelectedCrop}
             setAddNewCrop={setAddNewCrop}
@@ -89,8 +88,8 @@ function Home() {
               </Text>
               <CloseButton 
                 position="absolute" 
-                right="2" 
-                top="2"
+                right="-4" 
+                top="-4"
                 size="sm"
                 onClick={() => setShowTip(false)}
               />

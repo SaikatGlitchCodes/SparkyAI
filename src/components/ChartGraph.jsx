@@ -7,19 +7,12 @@ import {
   Tooltip,
   XAxis,
 } from "recharts"
+import { useDashboard } from "../context/DashBoardContext"
 
 const ChartGraph = () => {
+  const {chartData} = useDashboard();
   const chart = useChart({
-    data: [
-      { windows: 186, mac: 80, linux: 120, month: "January" },
-      { windows: 165, mac: 95, linux: 110, month: "February" },
-      { windows: 190, mac: 87, linux: 125, month: "March" },
-      { windows: 195, mac: 88, linux: 130, month: "May" },
-      { windows: 182, mac: 98, linux: 122, month: "June" },
-      { windows: 175, mac: 90, linux: 115, month: "August" },
-      { windows: 180, mac: 86, linux: 124, month: "October" },
-      { windows: 185, mac: 91, linux: 126, month: "November" },
-    ],
+    data: chartData,
     series: [
       { name: "windows", color: "teal.solid" },
       { name: "mac", color: "purple.solid" },

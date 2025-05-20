@@ -3,6 +3,7 @@ import { Box, Text, Image, Flex, Separator } from "@chakra-ui/react";
 import { motion } from 'framer-motion';
 import { GiUbisoftSun } from "react-icons/gi";
 import { WiCloudy, WiRain, WiSnow, WiThunderstorm } from "react-icons/wi";
+import { useDashboard } from '../context/DashBoardContext';
 
 // Create motion components
 const MotionBox = motion(Box);
@@ -11,22 +12,18 @@ const MotionImage = motion(Image);
 const MotionFlex = motion(Flex);
 const MotionDivider = motion(Separator);
 
-// Sample forecast data structure
-const defaultForecast = [
-  { day: "Mon", temp: "24", condition: "sunny" },
-  { day: "Tue", temp: "22", condition: "cloudy" },
-  { day: "Wed", temp: "19", condition: "rainy" },
-  { day: "Thu", temp: "20", condition: "cloudy" },
-  { day: "Fri", temp: "23", condition: "sunny" }
-];
+const WeatherCard = () => {
+  // Get weather data from context
+  const { weatherData } = useDashboard();
+  
+  const { 
+    temperature, 
+    condition, 
+    iconType, 
+    bgColor, 
+    forecast 
+  } = weatherData;
 
-const WeatherCard = ({ 
-  temperature = "25", 
-  condition = "Sunny", 
-  iconType = "sunny",
-  bgColor = "green.100",
-  forecast = defaultForecast
-}) => {
   // Select weather icon based on condition
   const getWeatherIcon = (type = iconType) => {
     switch(type.toLowerCase()) {
