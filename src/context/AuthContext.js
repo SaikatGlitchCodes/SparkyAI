@@ -81,51 +81,44 @@ export function AuthProvider({ children }) {
   const updateUserProfile = async (profileData) => {
     if (!user) return { success: false, error: 'User not authenticated' }
     
-    setProfileLoading(true)
     try {
-      // Check if profile exists
+      const updates = {
+        ...profileData,
+        user_id: user.id,           // Explicitly add user_id
+        updated_at: new Date()
+      }
+      
+      // Check if the profile exists first
       const { data: existingProfile } = await supabase
         .from('profiles')
         .select('*')
         .eq('user_id', user.id)
         .single()
       
-      const { data, error } = existingProfile
-        ? await supabase
-            .from('profiles')
-            .update({ ...profileData, updated_at: new Date() })
-            .eq('user_id', user.id)
-            .select()
-        : await supabase
-            .from('profiles')
-            .insert([{ ...profileData, user_id: user.id, created_at: new Date() }])
-            .select()
+      let result
       
-      if (error) throw error
+      if (existingProfile) {
+        // Update existing profile
+        result = await supabase
+          .from('profiles')
+          .update(updates)
+          .eq('user_id', user.id)
+      } else {
+        // Insert new profile
+        result = await supabase
+          .from('profiles')
+          .insert([{ ...updates, created_at: new Date() }])
+      }
       
-      setProfile(data?.[0] || data)
+      if (result.error) throw result.error
       
-      toaster.create({
-        title: "Profile updated",
-        description: "Your profile has been successfully saved",
-        status: "success",
-        duration: 3000,
-      })
+      // Refresh the profile data
+      await fetchUserProfile(user.id)
       
-      return { success: true, data: data?.[0] || data }
+      return { success: true }
     } catch (error) {
-      console.error('Error updating user profile:', error)
-      
-      toaster.create({
-        title: "Profile update failed",
-        description: error.message || "Failed to save profile",
-        status: "error",
-        duration: 5000,
-      })
-      
+      console.error('Error updating profile:', error)
       return { success: false, error: error.message }
-    } finally {
-      setProfileLoading(false)
     }
   }
 
