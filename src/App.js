@@ -6,6 +6,7 @@ import SignIn from './pages/SignIn';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { DashboardProvider } from './context/DashBoardContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import ProfilePage from './pages/ProfilePage';
 
 function AppRoutes() {
   const { user, loading } = useAuth();
@@ -25,6 +26,16 @@ function AppRoutes() {
             </DashboardProvider>
           </ProtectedRoute>
         } 
+      />
+      <Route 
+        path="/profile" 
+        element={
+          <ProtectedRoute>
+            <DashboardProvider>
+              <ProfilePage />
+            </DashboardProvider>
+          </ProtectedRoute>
+        }
       />
       <Route 
         path="/signin" 

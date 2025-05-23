@@ -3,9 +3,16 @@ import { Avatar, Box, Button, Flex, Popover, Portal, Text } from "@chakra-ui/rea
 import { GrStepsOption } from "react-icons/gr";
 import { useAuth } from '../context/AuthContext';
 import { ColorModeButton } from './ui/color-mode';
+import { useNavigate } from 'react-router-dom';
 
 const AvatarProfile = () => {
   const { signOut } = useAuth();
+  const navigate = useNavigate();
+  
+  const goToProfile = () => {
+    navigate('/profile');
+  };
+  
   return (
     <Flex justify="flex-end" align="center">
       <Popover.Root>
@@ -30,13 +37,16 @@ const AvatarProfile = () => {
                 <Button onClick={signOut} variant="outline" width="100%" colorPalette={"red"} size="sm">
                   Logout
                 </Button>
+                <Button onClick={goToProfile} variant="outline" width="100%" colorPalette={"green"} size="sm">
+                  Profile
+                </Button>
               </Popover.Body>
             </Popover.Content>
           </Popover.Positioner>
         </Portal>
       </Popover.Root>
-
-    </Flex>)
+    </Flex>
+  );
 };
 
 const Header = () => {

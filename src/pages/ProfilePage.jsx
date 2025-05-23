@@ -2,29 +2,35 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Box,
-    Button,
-    Flex,
-    Input,
-    VStack,
-    HStack,
-    Heading,
     Text,
+    Input,
     Textarea,
     Select,
+    Button,
+    Flex,
     Image,
-    InputGroup,
+    Heading,
+    Stack,
+    Grid,
+    GridItem,
+    Divider,
+    Spinner,
 } from '@chakra-ui/react';
-import { motion } from 'framer-motion';
 import { FiUser, FiMapPin, FiPhone, FiMail, FiHome } from 'react-icons/fi';
 import { GiFarmTractor } from 'react-icons/gi';
 import { useAuth } from '../context/AuthContext';
 
-const MotionBox = motion(Box);
-
 const ProfilePage = () => {
-    const { user, profile, profileLoading, updateUserProfile, uploadProfileImage, isProfileComplete } = useAuth();
+    const { 
+        user, 
+        profile, 
+        profileLoading, 
+        updateUserProfile, 
+        uploadProfileImage,
+        isProfileComplete 
+    } = useAuth();
+    
     const navigate = useNavigate();
-
     const [formData, setFormData] = useState({
         full_name: '',
         phone: '',
@@ -40,6 +46,7 @@ const ProfilePage = () => {
     const [avatarFile, setAvatarFile] = useState(null);
     const [avatarPreview, setAvatarPreview] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [statusMessage, setStatusMessage] = useState({ text: '', type: '' });
 
     // Load existing profile data
     useEffect(() => {
@@ -82,249 +89,320 @@ const ProfilePage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
+        setStatusMessage({ text: '', type: '' });
 
         try {
-            // Upload avatar if selected
+            // Upload avatar if a new one was selected
             if (avatarFile) {
                 const { success, url, error } = await uploadProfileImage(avatarFile);
                 if (!success) {
                     throw new Error(error || 'Failed to upload image');
                 }
             }
-
+            
             // Update profile data
             const { success, error } = await updateUserProfile(formData);
 
             if (!success) {
                 throw new Error(error || 'Failed to update profile');
             }
-
+            
+            setStatusMessage({ 
+                text: 'Profile updated successfully!', 
+                type: 'success' 
+            });
+            
             // Redirect to dashboard if coming from signup
-            if (new URLSearchParams(window.location.search).get('from') === 'signup') {
+            const fromParam = new URLSearchParams(window.location.search).get('from');
+            if (fromParam === 'signup') {
                 navigate('/');
             }
         } catch (error) {
-            console.log(error);
+            console.error('Error updating profile:', error);
+            setStatusMessage({ 
+                text: error.message || 'Failed to update profile', 
+                type: 'error' 
+            });
         } finally {
             setIsSubmitting(false);
         }
     };
 
+    if (profileLoading) {
+        return (
+            <Box textAlign="center" py={20}>
+                <Spinner size="xl" color="green.500" thickness="4px" />
+                <Text mt={4}>Loading profile data...</Text>
+            </Box>
+        );
+    }
+
     return (
-        <MotionBox
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            p={{ base: 4, md: 10 }}
-            maxWidth="1000px"
-            mx="auto"
-        >
-            <Heading as="h1" mb={8} textAlign="center">
-                Complete Your Profile
+        <Box maxW="1000px" mx="auto" p={{ base: 4, md: 10 }}>
+            <Heading textAlign="center" mb={6}>
+                {isProfileComplete() ? 'Edit Your Profile' : 'Complete Your Profile'}
             </Heading>
 
-            <Text mb={6} textAlign="center" color="gray.600">
-                Help us personalize your experience by filling in your profile details.
+            <Text textAlign="center" mb={8} color="gray.600">
+                Help us personalize your farming experience
             </Text>
 
+            {statusMessage.text && (
+                <Box
+                    mb={6}
+                    p={4}
+                    borderRadius="md"
+                    bg={statusMessage.type === 'success' ? 'green.100' : 'red.100'}
+                    color={statusMessage.type === 'success' ? 'green.800' : 'red.800'}
+                >
+                    {statusMessage.text}
+                </Box>
+            )}
+            
             <form onSubmit={handleSubmit}>
-                <Flex direction={{ base: 'column', md: 'row' }} gap={10}>
-                    {/* Avatar and Personal Info */}
-                    <VStack
-                        spacing={6}
-                        align="stretch"
-                        flex="1"
-                        as={motion.div}
-                        initial={{ x: -20, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: 0.2 }}
+                {/* Avatar Section */}
+                <Box textAlign="center" mb={8}>
+                    <Box
+                        position="relative"
+                        width="150px"
+                        height="150px"
+                        borderRadius="full"
+                        bg="gray.100"
+                        mx="auto"
+                        mb={2}
+                        overflow="hidden"
+                        cursor="pointer"
+                        onClick={() => document.getElementById('avatar-input').click()}
                     >
-                        <Box textAlign="center" mb={4}>
-                            <Box
-                                cursor='pointer'
-                                position="relative"
-                                width="150px"
-                                height="150px"
-                                borderRadius="full"
-                                bg="gray.100"
-                                mx="auto"
-                                overflow="hidden"
-                                _hover={{ opacity: 0.8 }}
-                                transition="all 0.3s"
+                        {avatarPreview ? (
+                            <Image
+                                src={avatarPreview}
+                                alt="Profile"
+                                objectFit="cover"
+                                width="100%"
+                                height="100%"
+                            />
+                        ) : (
+                            <Flex
+                                align="center"
+                                justify="center"
+                                height="100%"
+                                color="gray.400"
                             >
-                                {avatarPreview ? (
-                                    <Image
-                                        src={avatarPreview}
-                                        alt="Avatar preview"
-                                        objectFit="cover"
-                                        width="100%"
-                                        height="100%"
+                                <FiUser size="60px" />
+                            </Flex>
+                        )}
+                    </Box>
+
+                    <Text
+                        fontSize="sm"
+                        color="blue.500"
+                        cursor="pointer"
+                        onClick={() => document.getElementById('avatar-input').click()}
+                    >
+                        Change Photo
+                    </Text>
+
+                    <input
+                        id="avatar-input"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        style={{ display: 'none' }}
+                    />
+                </Box>
+
+                {/* Two-column layout */}
+                <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={8}>
+                    {/* Personal Information Column */}
+                    <GridItem>
+                        <Text fontWeight="bold" fontSize="lg" mb={4}>
+                            Personal Information
+                        </Text>
+                        
+                        <Stack spacing={4}>
+                            <Box>
+                                <Text mb={1} fontWeight="medium">
+                                    Full Name <Text as="span" color="red.500">*</Text>
+                                </Text>
+                                <Flex align="center" position="relative">
+                                    <Box position="absolute" left="3" top="2" color="gray.500">
+                                        <FiUser />
+                                    </Box>
+                                    <Input
+                                        name="full_name"
+                                        value={formData.full_name}
+                                        onChange={handleChange}
+                                        placeholder="Your full name"
+                                        pl="10"
+                                        required
                                     />
-                                ) : (
-                                    <Flex
-                                        align="center"
-                                        justify="center"
-                                        height="100%"
-                                        color="gray.400"
+                                </Flex>
+                            </Box>
+                            
+                            <Box>
+                                <Text mb={1} fontWeight="medium">
+                                    Email Address
+                                </Text>
+                                <Flex align="center" position="relative">
+                                    <Box position="absolute" left="3" top="2" color="gray.500">
+                                        <FiMail />
+                                    </Box>
+                                    <Input
+                                        value={user?.email || ''}
+                                        readOnly
+                                        pl="10"
+                                        bg="gray.50"
+                                    />
+                                </Flex>
+                                <Text fontSize="xs" color="gray.500" mt={1}>
+                                    Your email cannot be changed
+                                </Text>
+                            </Box>
+                            
+                            <Box>
+                                <Text mb={1} fontWeight="medium">
+                                    Phone Number
+                                </Text>
+                                <Flex align="center" position="relative">
+                                    <Box position="absolute" left="3" top="2" color="gray.500">
+                                        <FiPhone />
+                                    </Box>
+                                    <Input
+                                        name="phone"
+                                        value={formData.phone}
+                                        onChange={handleChange}
+                                        placeholder="Your phone number"
+                                        pl="10"
+                                    />
+                                </Flex>
+                            </Box>
+                            
+                            <Box>
+                                <Text mb={1} fontWeight="medium">
+                                    About You
+                                </Text>
+                                <Textarea
+                                    name="bio"
+                                    value={formData.bio}
+                                    onChange={handleChange}
+                                    placeholder="Tell us a bit about yourself..."
+                                    rows={4}
+                                />
+                            </Box>
+                        </Stack>
+                    </GridItem>
+
+                    {/* Farm Information Column */}
+                    <GridItem>
+                        <Text fontWeight="bold" fontSize="lg" mb={4}>
+                            Farm Information
+                        </Text>
+                        
+                        <Stack spacing={4}>
+                            <Box>
+                                <Text mb={1} fontWeight="medium">
+                                    Farm Name <Text as="span" color="red.500">*</Text>
+                                </Text>
+                                <Flex align="center" position="relative">
+                                    <Box position="absolute" left="3" top="2" color="gray.500">
+                                        <GiFarmTractor />
+                                    </Box>
+                                    <Input
+                                        name="farm_name"
+                                        value={formData.farm_name}
+                                        onChange={handleChange}
+                                        placeholder="Your farm name"
+                                        pl="10"
+                                        required
+                                    />
+                                </Flex>
+                            </Box>
+                            
+                            <Box>
+                                <Text mb={1} fontWeight="medium">
+                                    Farm Size
+                                </Text>
+                                <Flex gap={2}>
+                                    <Input
+                                        name="farm_size"
+                                        value={formData.farm_size}
+                                        onChange={handleChange}
+                                        placeholder="Size"
+                                        type="number"
+                                    />
+                                    {/* <Select
+                                        name="farm_size_unit"
+                                        value={formData.farm_size_unit}
+                                        onChange={handleChange}
+                                        width="120px"
                                     >
-                                        <FiUser size="60px" />
-                                    </Flex>
-                                )}
-                                <Box
-                                    position="absolute"
-                                    bottom="0"
-                                    left="0"
-                                    right="0"
-                                    bg="blackAlpha.600"
-                                    color="white"
-                                    py={1}
-                                    fontSize="sm"
-                                >
-                                    Change Photo
-                                </Box>
+                                        <option value="acres">Acres</option>
+                                        <option value="hectares">Hectares</option>
+                                        <option value="sq-ft">Sq. Ft.</option>
+                                    </Select> */}
+                                </Flex>
                             </Box>
-                            <Input
-                                id="avatar"
-                                name="avatar"
-                                type="file"
-                                accept="image/*"
-                                onChange={handleImageChange}
-                                display="none"
-                            />
-                        </Box>
-
-                        <Text>Full Name</Text>
-                        <InputGroup>
+                            
                             <Box>
-                                <FiUser color="gray.300" />
+                                <Text mb={1} fontWeight="medium">
+                                    Location <Text as="span" color="red.500">*</Text>
+                                </Text>
+                                <Flex align="center" position="relative">
+                                    <Box position="absolute" left="3" top="2" color="gray.500">
+                                        <FiMapPin />
+                                    </Box>
+                                    <Input
+                                        name="location"
+                                        value={formData.location}
+                                        onChange={handleChange}
+                                        placeholder="City, State"
+                                        pl="10"
+                                        required
+                                    />
+                                </Flex>
                             </Box>
-                            <Input
-                                name="full_name"
-                                placeholder="Your full name"
-                                value={formData.full_name}
-                                onChange={handleChange}
-                            />
-                        </InputGroup>
-
-                        <Text>Phone Number</Text>
-                        <InputGroup>
+                            
                             <Box>
-                                <FiPhone color="gray.300" />
+                                <Text mb={1} fontWeight="medium">
+                                    Farm Address
+                                </Text>
+                                <Flex align="center" position="relative">
+                                    <Box position="absolute" left="3" top="2" color="gray.500">
+                                        <FiHome />
+                                    </Box>
+                                    <Input
+                                        name="address"
+                                        value={formData.address}
+                                        onChange={handleChange}
+                                        placeholder="Your complete address"
+                                        pl="10"
+                                    />
+                                </Flex>
                             </Box>
-                            <Input
-                                name="phone"
-                                placeholder="Your phone number"
-                                value={formData.phone}
-                                onChange={handleChange}
-                            />
-                        </InputGroup>
-
-                        <Text>Email Address</Text>
-                        <InputGroup>
+                            
                             <Box>
-                                <FiMail color="gray.300" />
+                                <Text mb={1} fontWeight="medium">
+                                    Main Crops
+                                </Text>
+                                <Input
+                                    name="main_crops"
+                                    value={formData.main_crops}
+                                    onChange={handleChange}
+                                    placeholder="Wheat, Corn, Soybeans, etc."
+                                />
+                                <Text fontSize="xs" color="gray.500" mt={1}>
+                                    Separate different crops with commas
+                                </Text>
                             </Box>
-                            <Input
-                                value={user?.email || ''}
-                                isReadOnly
-                                bg="gray.50"
-                            />
-                        </InputGroup>
-                        <Text>Your email cannot be changed</Text>
-
-                        <Text>About You</Text>
-                        <Textarea
-                            name="bio"
-                            placeholder="Tell us a bit about yourself..."
-                            value={formData.bio}
-                            onChange={handleChange}
-                            rows={4}
-                        />
-                    </VStack>
-
-                    {/* Farm Info */}
-                    <VStack
-                        spacing={6}
-                        align="stretch"
-                        flex="1"
-                        as={motion.div}
-                        initial={{ x: 20, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: 0.3 }}
-                    >
-                        <Text>Farm Name</Text>
-                        <InputGroup>
-                            <Box>
-                                <GiFarmTractor />
-                            </Box>
-                            <Input
-                                name="farm_name"
-                                placeholder="Your farm name"
-                                value={formData.farm_name}
-                                onChange={handleChange}
-                            />
-                        </InputGroup>
-
-                        <Text>Farm Size</Text>
-                        <HStack>
-                            <Input
-                                name="farm_size"
-                                placeholder="Size"
-                                type="number"
-                                value={formData.farm_size}
-                                onChange={handleChange}
-                                flex="2"
-                            />
-                            <Select
-                                name="farm_size_unit"
-                                value={formData.farm_size_unit}
-                                onChange={handleChange}
-                                flex="1"
-                            >
-                                <option value="acres">Acres</option>
-                                <option value="hectares">Hectares</option>
-                                <option value="sq-ft">Sq. Ft.</option>
-                            </Select>
-                        </HStack>
-
-                        <Text>Location</Text>
-                        <InputGroup>
-                            <Box>
-                                <FiMapPin />
-                            </Box>
-                            <Input
-                                name="location"
-                                placeholder="City, State"
-                                value={formData.location}
-                                onChange={handleChange}
-                            />
-                        </InputGroup>
-
-                        <Text>Farm Address</Text>
-                        <InputGroup>
-                            <Box>
-                                <FiHome />
-                            </Box>
-                            <Input
-                                name="address"
-                                placeholder="Your complete address"
-                                value={formData.address}
-                                onChange={handleChange}
-                            />
-                        </InputGroup>
-
-                        <Text>Main Crops</Text>
-                        <Input
-                            name="main_crops"
-                            placeholder="Wheat, Corn, Soybeans, etc."
-                            value={formData.main_crops}
-                            onChange={handleChange}
-                        />
-                        <Text>Separate different crops with commas</Text>
-                    </VStack>
-                </Flex>
-
-                <Box mt={10} textAlign="center">
+                        </Stack>
+                    </GridItem>
+                </Grid>
+                
+                {/* <Divider my={8} /> */}
+                
+                {/* Submit Button - Centered */}
+                <Box textAlign="center" mt={6}>
                     <Button
                         type="submit"
                         colorScheme="green"
@@ -332,15 +410,12 @@ const ProfilePage = () => {
                         px={10}
                         isLoading={isSubmitting}
                         loadingText="Saving..."
-                        as={motion.button}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
                     >
-                        Save Profile
+                        {isProfileComplete() ? 'Save Changes' : 'Complete Profile'}
                     </Button>
                 </Box>
             </form>
-        </MotionBox>
+        </Box>
     );
 };
 
